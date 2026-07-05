@@ -1,0 +1,41 @@
+{
+  "testCases": [
+    {
+      "id": "TC_001_POSITIVE_TRIGGER",
+      "type": "positive",
+      "inputQuery": "Generate a markdown deep-dive summary for YouTube video dQw4w9WgXcQ containing transcript chapters and key takeaways.",
+      "assert": {
+        "expectedFired": true,
+        "skillId": "youtube-summarizer"
+      }
+    },
+    {
+      "id": "TC_002_NEGATIVE_TRIGGER",
+      "type": "negative",
+      "inputQuery": "Show database schema health, inspect system load and perform billing balance audit.",
+      "assert": {
+        "expectedFired": false,
+        "skillId": "youtube-summarizer"
+      }
+    },
+    {
+      "id": "TC_003_TRAJECTORY_EXECUTION",
+      "type": "trajectory",
+      "inputQuery": "Fetch transcript segments and check summarization metrics for video aBcD1234eFg.",
+      "trajectoryMode": "IN_ORDER",
+      "expected_tool_calls": [
+        "youtube-transcript-server/get_youtube_transcript",
+        "youtube-transcript-server/clarify_summarization_goal"
+      ],
+      "verificationRubric": {
+        "requiredFields": [
+          "timestamps",
+          "links",
+          "codeBlocks",
+          "wordCount"
+        ],
+        "minWordCount": 1
+      }
+    }
+  ]
+}

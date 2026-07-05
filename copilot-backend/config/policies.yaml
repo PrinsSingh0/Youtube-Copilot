@@ -1,0 +1,29 @@
+# ==============================================================================
+#  YOUTUBE COPILOT v5.0.0 — POLICY CONFIGURATION MATRIX (config/policies.yaml)
+#  Statically mapped environment & role permissions for tool gates.
+# ==============================================================================
+
+environment:
+  name: development
+  blocked_tools:
+    - send_email
+    - billing_payout
+    - database_wipe
+
+roles:
+  user:
+    allowed_tools:
+      - get_youtube_transcript
+      - clarify_summarization_goal
+      - classify_video
+      - search_knowledge_base
+      - generate_structured_notes
+  admin:
+    allowed_tools:
+      - get_youtube_transcript
+      - clarify_summarization_goal
+      - classify_video
+      - search_knowledge_base
+      - generate_structured_notes
+      - sync_notes_to_notion
+      - deduplicate_notes

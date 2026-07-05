@@ -1,0 +1,1334 @@
+/* ==============================================================================
+   YOUTUBE COPILOT v4.0.0 — DESIGN SYSTEM (styles.css)
+   Design Tokens § 4.1 — All surface, glow, and motion tokens
+   ============================================================================== */
+
+/* ─── CSS Custom Properties (Design Tokens) ─────────────────────────────────── */
+#yt-copilot-root {
+  --surface-base: rgba(35, 44, 51, 0.88);
+  --surface-blur: blur(16px);
+  --focus-well: rgba(11, 37, 69, 0.45);
+  --accent-glow: #8DA9C4;
+  --accent-glow-rgb: 141, 169, 196;
+  --text-primary: #DAEDF7;
+  --text-muted: rgba(141, 169, 196, 0.60);
+  --status-recording: #AD343E;
+  --status-amber: #FFAA00;
+  --status-success: #34A853;
+  --border-subtle: rgba(141, 169, 196, 0.18);
+  --border-active: rgba(141, 169, 196, 0.55);
+  --shadow-depth: 0 24px 64px rgba(0, 0, 0, 0.65), 0 4px 16px rgba(0, 0, 0, 0.4);
+
+  /* Motion Curves */
+  --spring-open: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --spring-close: cubic-bezier(0.36, 0, 0.66, -0.56);
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Layout */
+  --badge-size: 48px;
+  --panel-width: 320px;
+  --z-copilot: 2147483647;
+
+  all: initial;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* ─── Floating Root Container ─────────────────────────────────────────────── */
+#yt-copilot-root {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  z-index: var(--z-copilot);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  pointer-events: none;
+}
+
+/* ─── Compact Badge Bar (Idle State) ─────────────────────────────────────── */
+#copilot-badge-bar {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface-base);
+  backdrop-filter: var(--surface-blur);
+  -webkit-backdrop-filter: var(--surface-blur);
+  border: 1px solid var(--border-subtle);
+  border-radius: 28px;
+  padding: 6px 10px 6px 8px;
+  box-shadow: var(--shadow-depth);
+  transition: border-color 0.2s var(--ease-standard),
+    box-shadow 0.2s var(--ease-standard);
+}
+
+#copilot-badge-bar:hover {
+  border-color: var(--border-active);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(var(--accent-glow-rgb), 0.2);
+}
+
+/* ─── Logo Trigger Button ─────────────────────────────────────────────────── */
+#copilot-logo-trigger {
+  width: var(--badge-size);
+  height: var(--badge-size);
+  border-radius: 50%;
+  border: 2px solid var(--border-subtle);
+  background: var(--focus-well);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: border-color 0.2s, transform 0.15s var(--spring-open), background 0.2s;
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+#copilot-logo-trigger:hover {
+  transform: scale(1.08);
+  border-color: var(--accent-glow);
+  background: rgba(141, 169, 196, 0.12);
+}
+
+#copilot-logo-trigger svg {
+  width: 22px;
+  height: 22px;
+  pointer-events: none;
+}
+
+/* Recording pulse ring */
+#copilot-logo-trigger.recording {
+  border-color: var(--status-recording);
+  background: rgba(173, 52, 62, 0.15);
+}
+
+#copilot-logo-trigger.recording::before {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  border: 2px solid var(--status-recording);
+  animation: copilot-pulse-ring 1.4s ease-out infinite;
+}
+
+/* Amber draft dot */
+#copilot-draft-dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--status-amber);
+  border: 2px solid rgba(35, 44, 51, 0.9);
+  display: none;
+  animation: copilot-dot-pop 0.3s var(--spring-open) forwards;
+}
+
+#copilot-draft-dot.visible {
+  display: block;
+}
+
+/* ─── Platform & Notebook Dropdowns ───────────────────────────────────────── */
+#pkm-destination-selector,
+#copilot-notebook-dropdown {
+  background: var(--focus-well);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  color: var(--text-primary);
+  font-size: 11.5px;
+  font-family: inherit;
+  padding: 6px 10px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  -webkit-appearance: none;
+}
+
+#pkm-destination-selector:focus,
+#copilot-notebook-dropdown:focus {
+  border-color: var(--accent-glow);
+}
+
+#pkm-destination-selector option,
+#copilot-notebook-dropdown option {
+  background: #1a2230;
+  color: var(--text-primary);
+}
+
+#pkm-destination-selector {
+  max-width: 105px;
+}
+
+#copilot-notebook-dropdown {
+  max-width: 130px;
+}
+
+/* ─── Pop-Out Panel (Active / Expanded State) ────────────────────────────── */
+#copilot-popout-panel {
+  pointer-events: auto;
+  width: var(--panel-width);
+  background: var(--surface-base);
+  backdrop-filter: var(--surface-blur);
+  -webkit-backdrop-filter: var(--surface-blur);
+  border: 1px solid var(--border-subtle);
+  border-radius: 18px;
+  box-shadow: var(--shadow-depth);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow: hidden;
+
+  /* Collapsed state */
+  max-height: 0;
+  opacity: 0;
+  transform: scaleY(0.85) translateY(12px);
+  transform-origin: bottom right;
+  transition: max-height 250ms var(--spring-open),
+    opacity 200ms var(--ease-standard),
+    transform 250ms var(--spring-open);
+}
+
+#copilot-popout-panel.open {
+  max-height: 480px;
+  opacity: 1;
+  transform: scaleY(1) translateY(0);
+}
+
+/* ─── Panel Header ────────────────────────────────────────────────────────── */
+#copilot-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px 10px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+#copilot-panel-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+#copilot-timer-display {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+#copilot-timer-display.warning {
+  color: var(--status-amber);
+}
+
+/* ─── AI Suggestion Display Well ─────────────────────────────────────────── */
+#copilot-suggestion-well {
+  margin: 10px 14px 0;
+  background: var(--focus-well);
+  border: 1px dashed var(--border-subtle);
+  border-radius: 10px;
+  padding: 10px 12px;
+  min-height: 52px;
+  max-height: 110px;
+  overflow-y: auto;
+  font-size: 11.5px;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+#copilot-suggestion-well::-webkit-scrollbar {
+  width: 3px;
+}
+
+#copilot-suggestion-well::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: 2px;
+}
+
+#copilot-suggestion-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  padding: 8px 14px 2px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#copilot-ai-spinner {
+  display: none;
+  font-size: 9px;
+  color: var(--accent-glow);
+  font-weight: 700;
+  animation: copilot-blink 1s ease-in-out infinite;
+}
+
+#copilot-ai-spinner.active {
+  display: inline;
+}
+
+/* ─── Text Input Row ──────────────────────────────────────────────────────── */
+#copilot-input-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 10px 14px 14px;
+}
+
+#copilot-textarea {
+  flex: 1;
+  min-height: 42px;
+  max-height: 120px;
+  background: var(--focus-well);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: var(--text-primary);
+  font-size: 12.5px;
+  font-family: inherit;
+  line-height: 1.4;
+  resize: none;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  overflow-y: auto;
+}
+
+#copilot-textarea::placeholder {
+  color: var(--text-muted);
+}
+
+#copilot-textarea:focus {
+  border-color: var(--accent-glow);
+  box-shadow: 0 0 0 3px rgba(var(--accent-glow-rgb), 0.12);
+}
+
+/* Enter key glow flash */
+#copilot-textarea.dispatch-flash {
+  border-color: var(--accent-glow);
+  box-shadow: 0 0 0 3px rgba(var(--accent-glow-rgb), 0.35);
+  animation: copilot-border-flash 0.3s var(--ease-standard) forwards;
+}
+
+/* ─── Icon Buttons ────────────────────────────────────────────────────────── */
+.copilot-icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
+  background: var(--focus-well);
+  color: var(--text-primary);
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.15s var(--spring-open),
+    background 0.15s,
+    border-color 0.15s;
+}
+
+.copilot-icon-btn:hover {
+  transform: scale(1.1);
+  border-color: var(--accent-glow);
+  background: rgba(var(--accent-glow-rgb), 0.1);
+}
+
+.copilot-icon-btn:active {
+  transform: scale(0.94);
+}
+
+#copilot-mic-btn.recording {
+  background: rgba(173, 52, 62, 0.2);
+  border-color: var(--status-recording);
+}
+
+/* ─── Clear Control ───────────────────────────────────────────────────────── */
+#copilot-clear-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 10px;
+  cursor: pointer;
+  padding: 0 2px;
+  font-family: inherit;
+  transition: color 0.15s;
+  white-space: nowrap;
+}
+
+#copilot-clear-btn:hover {
+  color: var(--text-primary);
+}
+
+/* ─── Free Tier Countdown ─────────────────────────────────────────────────── */
+#copilot-usage-bar-wrap {
+  padding: 0 14px 8px;
+  display: none;
+}
+
+#copilot-usage-bar-wrap.visible {
+  display: block;
+}
+
+#copilot-usage-bar-track {
+  height: 3px;
+  background: var(--border-subtle);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+#copilot-usage-bar-fill {
+  height: 100%;
+  background: var(--accent-glow);
+  border-radius: 2px;
+  transition: width 0.5s var(--ease-standard), background 0.3s;
+}
+
+#copilot-usage-bar-fill.critical {
+  background: var(--status-amber);
+}
+
+/* ─── Drafts Slide-Out Tray ───────────────────────────────────────────────── */
+#copilot-drafts-tray {
+  pointer-events: auto;
+  position: fixed;
+  bottom: 80px;
+  right: 350px;
+  width: 280px;
+  max-height: 360px;
+  background: var(--surface-base);
+  backdrop-filter: var(--surface-blur);
+  -webkit-backdrop-filter: var(--surface-blur);
+  border: 1px solid rgba(var(--accent-glow-rgb), 0.25);
+  border-radius: 16px;
+  box-shadow: var(--shadow-depth);
+  overflow: hidden;
+  z-index: calc(var(--z-copilot) - 1);
+
+  opacity: 0;
+  transform: translateX(20px);
+  pointer-events: none;
+  transition: opacity 200ms var(--ease-standard), transform 200ms var(--spring-open);
+}
+
+#copilot-drafts-tray.open {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+#copilot-drafts-header {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--status-amber);
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+
+#copilot-drafts-list {
+  overflow-y: auto;
+  max-height: 280px;
+  padding: 6px 0;
+}
+
+.copilot-draft-item {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.copilot-draft-item:last-child {
+  border-bottom: none;
+}
+
+.copilot-draft-text {
+  font-size: 11.5px;
+  color: var(--text-primary);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.copilot-draft-meta {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.copilot-draft-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.copilot-draft-retry,
+.copilot-draft-trash {
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 500;
+  transition: background 0.15s;
+}
+
+.copilot-draft-retry {
+  border-color: var(--accent-glow);
+  color: var(--accent-glow);
+  background: transparent;
+}
+
+.copilot-draft-retry:hover {
+  background: rgba(var(--accent-glow-rgb), 0.15);
+}
+
+.copilot-draft-trash {
+  border-color: var(--status-recording);
+  color: var(--status-recording);
+  background: transparent;
+}
+
+.copilot-draft-trash:hover {
+  background: rgba(173, 52, 62, 0.15);
+}
+
+/* ─── Paywall Overlay (Day 8) ────────────────────────────────────────────── */
+#copilot-paywall-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-copilot) - 2);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  background: rgba(11, 20, 38, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: copilot-fade-in 0.4s var(--ease-standard) forwards;
+}
+
+#copilot-paywall-card {
+  background: rgba(35, 44, 51, 0.96);
+  border: 1px solid var(--border-active);
+  border-radius: 24px;
+  padding: 40px 36px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: var(--shadow-depth);
+  animation: copilot-slide-down 0.4s var(--spring-open) forwards;
+}
+
+#copilot-paywall-card h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 8px;
+}
+
+#copilot-paywall-card p {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin: 0 0 28px;
+}
+
+.copilot-paywall-btn {
+  display: block;
+  width: 100%;
+  padding: 13px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  border: none;
+  transition: transform 0.15s var(--spring-open), opacity 0.15s;
+  margin-bottom: 10px;
+}
+
+.copilot-paywall-btn:hover {
+  transform: scale(1.02);
+  opacity: 0.92;
+}
+
+.copilot-paywall-btn.primary {
+  background: linear-gradient(135deg, #8DA9C4, #5b8db8);
+  color: #0b1526;
+}
+
+.copilot-paywall-btn.secondary {
+  background: var(--focus-well);
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+}
+
+/* ─── Lock Overlay on Premium Features ───────────────────────────────────── */
+.copilot-locked-option {
+  opacity: 0.45;
+  cursor: not-allowed !important;
+}
+
+/* ─── Keyframe Animations ────────────────────────────────────────────────── */
+@keyframes copilot-pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(1.55);
+    opacity: 0;
+  }
+}
+
+@keyframes copilot-dot-pop {
+  0% {
+    transform: scale(0);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes copilot-blink {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.3;
+  }
+}
+
+@keyframes copilot-border-flash {
+  0% {
+    box-shadow: 0 0 0 4px rgba(141, 169, 196, 0.45);
+  }
+
+  100% {
+    box-shadow: 0 0 0 3px rgba(141, 169, 196, 0.12);
+  }
+}
+
+@keyframes copilot-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes copilot-slide-down {
+  from {
+    transform: translateY(-24px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ─── Individual Page Toggle Styles ───────────────────────────────────────── */
+#copilot-toggle-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+  font-family: inherit;
+}
+
+#copilot-individual-page-toggle {
+  cursor: pointer;
+  width: 13px;
+  height: 13px;
+  accent-color: var(--accent-glow);
+  margin: 0;
+}
+
+/* ─── Create New File Button Styles ────────────────────────────────────────── */
+#copilot-new-file-btn {
+  background: var(--focus-well);
+  border: 1px solid var(--border-subtle);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  color: var(--text-primary);
+  font-size: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s var(--spring-open), border-color 0.2s, background 0.2s;
+  padding: 0;
+  outline: none;
+  font-family: inherit;
+  flex-shrink: 0;
+}
+
+#copilot-new-file-btn:hover {
+  transform: scale(1.15);
+  border-color: var(--accent-glow);
+  background: rgba(141, 169, 196, 0.15);
+}
+
+#copilot-new-file-btn:active {
+  transform: scale(0.9);
+}
+
+#copilot-new-file-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ─── Dashboard Pill Button ──────────────────────────────────────────────────── */
+#copilot-dashboard-btn {
+  background: linear-gradient(135deg, rgba(141,169,196,0.15), rgba(91,141,184,0.10));
+  border: 1px solid rgba(141,169,196,0.35);
+  border-radius: 20px;
+  height: 28px;
+  padding: 0 11px 0 9px;
+  color: #8DA9C4;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 10.5px;
+  font-weight: 600;
+  font-family: inherit;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  outline: none;
+  transition: transform 0.15s var(--spring-open), border-color 0.2s, background 0.2s, box-shadow 0.2s, color 0.15s;
+}
+#copilot-dashboard-btn span { line-height: 1; }
+#copilot-dashboard-btn:hover {
+  transform: scale(1.04);
+  border-color: var(--accent-glow);
+  background: rgba(141,169,196,0.22);
+  color: #DAEDF7;
+  box-shadow: 0 0 12px rgba(var(--accent-glow-rgb),0.28);
+}
+#copilot-dashboard-btn:hover svg rect { stroke: #DAEDF7; transition: stroke 0.2s; }
+#copilot-dashboard-btn:active { transform: scale(0.97); }
+
+/* ─── Auth Avatar Button ─────────────────────────────────────────────────────── */
+#copilot-auth-avatar {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid rgba(141,169,196,0.35);
+  background: rgba(11,37,69,0.5);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0;
+  outline: none;
+  overflow: visible;
+  transition: border-color 0.2s, transform 0.15s var(--spring-open), box-shadow 0.2s;
+}
+#copilot-auth-avatar:hover { transform: scale(1.1); }
+
+/* Login-state ring */
+#copilot-auth-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  pointer-events: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+/* Logged OUT — red pulsing ring */
+#copilot-auth-avatar.copilot-auth-avatar--logged-out { border-color: rgba(173,52,62,0.5); }
+#copilot-auth-avatar.copilot-auth-avatar--logged-out:hover {
+  border-color: #AD343E;
+  box-shadow: 0 0 10px rgba(173,52,62,0.4);
+}
+#copilot-auth-avatar.copilot-auth-avatar--logged-out #copilot-auth-ring {
+  border-color: rgba(173,52,62,0.35);
+  animation: copilot-auth-ring-red 2s ease-in-out infinite;
+}
+
+/* Logged IN — green solid ring */
+#copilot-auth-avatar.copilot-auth-avatar--logged-in { border-color: rgba(52,168,83,0.6); }
+#copilot-auth-avatar.copilot-auth-avatar--logged-in:hover {
+  border-color: #34A853;
+  box-shadow: 0 0 10px rgba(52,168,83,0.35);
+}
+#copilot-auth-avatar.copilot-auth-avatar--logged-in #copilot-auth-ring {
+  border-color: rgba(52,168,83,0.25);
+}
+
+/* Avatar photo */
+#copilot-avatar-img {
+  width: 26px; height: 26px;
+  border-radius: 50%; object-fit: cover; display: none;
+}
+
+/* Anon person icon */
+#copilot-avatar-anon { width: 16px; height: 16px; pointer-events: none; }
+
+/* Ring pulse animation */
+@keyframes copilot-auth-ring-red {
+  0%,100% { transform: scale(1); opacity: 0.6; }
+  50%      { transform: scale(1.18); opacity: 0.15; }
+}
+
+/* ==============================================================================
+   YOUTUBE COPILOT v5.0.0 — GLASSMORPHIC DASHBOARD STYLING
+   ============================================================================== */
+
+:root {
+  --db-bg: #0f141c;
+  --db-surface: rgba(26, 35, 43, 0.85);
+  --db-frost: rgba(35, 44, 51, 0.70);
+  --db-accent: #00f2fe;
+  --db-accent-glow: rgba(0, 242, 254, 0.25);
+  --db-text: #daedf7;
+  --db-muted: rgba(141, 169, 196, 0.60);
+  --db-success: #34A853;
+  --db-border: rgba(141, 169, 196, 0.16);
+  --db-shadow: 0 30px 90px rgba(0, 0, 0, 0.60);
+}
+
+body:has(.dashboard-grid-container) {
+  background: radial-gradient(circle at 70% 10%, rgba(0, 242, 254, 0.05) 0%, transparent 60%),
+              radial-gradient(circle at 10% 80%, rgba(141, 169, 196, 0.04) 0%, transparent 50%),
+              var(--db-bg) !important;
+  color: var(--db-text) !important;
+  margin: 0;
+  padding: 40px 24px;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.dashboard-grid-container {
+  display: grid;
+  grid-template-columns: 80px 1fr 360px;
+  gap: 32px;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+@media (max-width: 1200px) {
+  .dashboard-grid-container {
+    grid-template-columns: 80px 1fr;
+  }
+  .right-metrics-panel {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-grid-container {
+    grid-template-columns: 1fr;
+  }
+  .sidebar-navigation {
+    display: none;
+  }
+}
+
+/* ─── SIDEBAR NAVIGATION ─── */
+.sidebar-navigation {
+  background: var(--db-surface);
+  border: 1px solid var(--db-border);
+  border-radius: 24px;
+  padding: 24px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+  height: calc(100vh - 120px);
+  position: sticky;
+  top: 40px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.nav-brand-logo {
+  font-size: 32px;
+  background: linear-gradient(135deg, var(--db-accent), #4facfe);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: logo-float 3s ease-in-out infinite;
+}
+
+@keyframes logo-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.nav-menu-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  align-items: center;
+}
+
+.nav-link {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--db-muted);
+  font-size: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.nav-link:hover {
+  background: rgba(141, 169, 196, 0.1);
+  color: var(--db-text);
+  border-color: var(--db-border);
+  transform: scale(1.05);
+}
+
+.nav-link.active {
+  background: var(--db-accent-glow);
+  color: var(--db-accent);
+  border-color: rgba(0, 242, 254, 0.35);
+  box-shadow: 0 0 15px rgba(0, 242, 254, 0.15);
+}
+
+/* ─── MAIN CONTENT STREAM ─── */
+.main-content-stream {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.dashboard-user-header h1 {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  margin-bottom: 6px;
+}
+
+.dashboard-user-header h1 span {
+  animation: wave 1.5s ease-in-out infinite alternate;
+  display: inline-block;
+  transform-origin: 70% 70%;
+}
+
+@keyframes wave {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(12deg); }
+}
+
+.dashboard-user-header .subtitle-text {
+  color: var(--db-muted);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* PREMIUM HERO BANNER */
+.premium-hero-banner {
+  background: linear-gradient(135deg, rgba(0, 242, 254, 0.15) 0%, rgba(79, 172, 254, 0.1) 50%, rgba(26, 35, 43, 0.5) 100%);
+  border: 1px solid rgba(0, 242, 254, 0.25);
+  border-radius: 28px;
+  padding: 32px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25), inset 0 0 20px rgba(0, 242, 254, 0.05);
+}
+
+.hero-text-content h2 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.hero-text-content p {
+  color: var(--db-muted);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.banner-action-btn {
+  background: linear-gradient(135deg, var(--db-accent) 0%, #4facfe 100%);
+  color: #0b1526;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 16px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  box-shadow: 0 10px 25px rgba(0, 242, 254, 0.2);
+}
+
+.banner-action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px rgba(0, 242, 254, 0.35);
+  opacity: 0.95;
+}
+
+/* ACTIVE COURSES GRID */
+.learning-sources-section h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 18px;
+  letter-spacing: -0.2px;
+}
+
+.cards-layout-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.learning-source-card {
+  background: var(--db-surface);
+  border: 1px solid var(--db-border);
+  border-radius: 20px;
+  overflow: hidden;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: var(--db-shadow);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.learning-source-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(0, 242, 254, 0.35);
+  box-shadow: 0 20px 40px rgba(0, 242, 254, 0.08), 0 0 0 1px rgba(0, 242, 254, 0.1);
+}
+
+.card-cover-art {
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--db-border);
+}
+
+.source-platform-badge {
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(15, 20, 28, 0.8);
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--db-border);
+}
+
+.card-details-box {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex-grow: 1;
+}
+
+.topic-tag-pill {
+  align-self: flex-start;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--db-accent);
+  background: var(--db-accent-glow);
+  padding: 4px 10px;
+  border-radius: 10px;
+  letter-spacing: 0.5px;
+}
+
+.source-lecture-title {
+  font-size: 14.5px;
+  font-weight: 600;
+  line-height: 1.4;
+  height: 40px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.card-session-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  border-top: 1px solid rgba(141, 169, 196, 0.08);
+  padding-top: 12px;
+}
+
+.access-time-label {
+  font-size: 11.5px;
+  color: var(--db-muted);
+}
+
+.resume-session-btn {
+  background: transparent;
+  border: 1px solid var(--db-border);
+  color: var(--db-text);
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.resume-session-btn:hover {
+  background: var(--db-accent-glow);
+  border-color: var(--db-accent);
+  color: var(--db-accent);
+}
+
+.empty-state-fallback {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 48px;
+  background: rgba(141, 169, 196, 0.02);
+  border: 1px dashed var(--db-border);
+  border-radius: 20px;
+}
+
+.empty-icon {
+  font-size: 44px;
+  margin-bottom: 12px;
+}
+
+/* ─── RIGHT METRICS PANEL ─── */
+.right-metrics-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.user-profile-summary-card {
+  background: var(--db-surface);
+  border: 1px solid var(--db-border);
+  border-radius: 24px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: var(--db-shadow);
+}
+
+.avatar-frame {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(0, 242, 254, 0.2) 0%, rgba(141, 169, 196, 0.1) 100%);
+  border: 2px solid var(--db-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  margin-bottom: 12px;
+}
+
+#profile-display-name {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+#profile-display-handle {
+  font-size: 13px;
+  color: var(--db-muted);
+  margin-bottom: 20px;
+}
+
+.profile-stats-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  width: 100%;
+  border-top: 1px solid rgba(141, 169, 196, 0.08);
+  padding-top: 16px;
+  gap: 4px;
+}
+
+.profile-stat-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.stat-num {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--db-text);
+}
+
+.stat-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--db-muted);
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* CHART GLASS CONTAINER */
+.chart-glass-container {
+  background: var(--db-surface);
+  border: 1px solid var(--db-border);
+  border-radius: 24px;
+  padding: 24px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: var(--db-shadow);
+}
+
+.chart-glass-container h3, .queue-glass-container h3 {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  letter-spacing: -0.2px;
+}
+
+.trends-canvas-wrapper {
+  height: 220px;
+  position: relative;
+  width: 100%;
+}
+
+/* QUEUE GLASS STACK */
+.queue-glass-container {
+  background: var(--db-surface);
+  border: 1px solid var(--db-border);
+  border-radius: 24px;
+  padding: 24px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: var(--db-shadow);
+}
+
+#live-sm2-queue-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.queue-item-wrapper {
+  background: rgba(141, 169, 196, 0.04);
+  border: 1px solid rgba(141, 169, 196, 0.08);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: all 0.2s;
+}
+
+.queue-item-wrapper:hover {
+  background: rgba(141, 169, 196, 0.08);
+  border-color: rgba(141, 169, 196, 0.15);
+}
+
+.queue-item-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.queue-topic-pill {
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--db-accent);
+  background: var(--db-accent-glow);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.queue-interval-badge {
+  font-size: 10px;
+  color: var(--db-muted);
+  font-weight: 600;
+}
+
+.queue-card-question {
+  font-size: 13.5px;
+  line-height: 1.4;
+  height: 38px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.queue-solve-quiz-btn {
+  background: var(--db-surface);
+  border: 1px solid var(--db-border);
+  color: var(--db-text);
+  padding: 6px 0;
+  width: 100%;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 11.5px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.queue-solve-quiz-btn:hover {
+  background: var(--db-accent);
+  color: #0b1526;
+  border-color: var(--db-accent);
+}
+
+.empty-queue-fallback {
+  text-align: center;
+  padding: 24px;
+}
+
+.celebrate-emoji {
+  font-size: 36px;
+  margin-bottom: 8px;
+  animation: spin-slow 10s linear infinite;
+}
+
+@keyframes spin-slow {
+  to { transform: rotate(360deg); }
+}
+
+.loading-placeholder {
+  color: var(--db-muted);
+  font-size: 13px;
+  text-align: center;
+  padding: 20px 0;
+}

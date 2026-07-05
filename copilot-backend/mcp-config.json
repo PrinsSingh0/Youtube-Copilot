@@ -1,0 +1,28 @@
+{
+  "mcpServers": {
+    "youtube-transcript-server": {
+      "command": "node",
+      "args": [
+        "./src/agent/mcp/youtubeTranscriptServer.js"
+      ],
+      "env": {
+        "GEMINI_API_KEY": "process.env.GEMINI_API_KEY",
+        "SUPABASE_URL": "process.env.SUPABASE_URL",
+        "SUPABASE_SERVICE_ROLE_KEY": "process.env.SUPABASE_SERVICE_ROLE_KEY",
+        "NODE_ENV": "process.env.NODE_ENV"
+      }
+    },
+    "notion-pkm-sync-server": {
+      "command": "node",
+      "args": [
+        "./src/agent/mcp/notionPkmSyncServer.js"
+      ],
+      "env": {
+        "NOTION_API_KEY": "process.env.NOTION_API_KEY",
+        "SUPABASE_URL": "process.env.SUPABASE_URL",
+        "SUPABASE_SERVICE_ROLE_KEY": "process.env.SUPABASE_SERVICE_ROLE_KEY",
+        "NODE_ENV": "process.env.NODE_ENV"
+      }
+    }
+  }
+}

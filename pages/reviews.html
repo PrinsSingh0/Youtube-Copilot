@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spaced Repetition Review Quiz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:           #141A1F;
+      --surface:      #232C33;
+      --frost:        rgba(35, 44, 51, 0.85);
+      --accent:       #8DA9C4;
+      --accent-glow:  rgba(141, 169, 196, 0.25);
+      --text:         #DAEDF7;
+      --muted:        rgba(141, 169, 196, 0.60);
+      --success:      #4EBE7B;
+      --danger:       #AD343E;
+      --border:       rgba(141, 169, 196, 0.15);
+      --spring:       cubic-bezier(0.34, 1.56, 0.64, 1);
+      --ease:         cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    html, body {
+      min-height: 100vh;
+      font-family: 'Inter', system-ui, sans-serif;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(141, 169, 196, 0.08) 0%, transparent 80%),
+                  linear-gradient(160deg, #0f151a 0%, #161e24 100%);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 16px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 560px;
+      background: var(--frost);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      overflow: hidden;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 40px 100px rgba(0,0,0,0.6), 0 0 0 1px rgba(141,169,196,0.07);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-header {
+      border-bottom: 1px solid var(--border);
+      padding: 24px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .progress-text {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .card-body {
+      padding: 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      min-height: 280px;
+      justify-content: center;
+    }
+
+    .quiz-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .topic-badge {
+      align-self: flex-start;
+      background: rgba(141, 169, 196, 0.15);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .question-box {
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1.5;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      display: none;
+    }
+
+    .solution-box {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(141, 169, 196, 0.08);
+      border-radius: 14px;
+      padding: 16px;
+      display: none;
+      white-space: pre-wrap;
+    }
+
+    .btn-show {
+      padding: 16px;
+      background: var(--accent);
+      border: none;
+      border-radius: 12px;
+      color: #0b1526;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s var(--spring), opacity 0.15s;
+    }
+
+    .btn-show:hover {
+      transform: scale(1.02);
+      opacity: 0.9;
+    }
+
+    /* Rating buttons layout */
+    .rating-container {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .rating-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .rating-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+    }
+
+    .btn-rate {
+      height: 48px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text);
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, border-color 0.2s, transform 0.1s;
+    }
+
+    .btn-rate span {
+      font-size: 9px;
+      font-weight: 500;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .btn-rate:hover {
+      transform: scale(1.05);
+    }
+
+    /* Red gradients for incorrect, green for correct */
+    .btn-rate[data-score="0"]:hover, .btn-rate[data-score="1"]:hover, .btn-rate[data-score="2"]:hover {
+      background: rgba(173, 52, 62, 0.15);
+      border-color: var(--danger);
+      color: #FF5A5F;
+    }
+
+    .btn-rate[data-score="3"]:hover, .btn-rate[data-score="4"]:hover, .btn-rate[data-score="5"]:hover {
+      background: rgba(78, 190, 123, 0.15);
+      border-color: var(--success);
+      color: var(--success);
+    }
+
+    /* Empty queue / success styling */
+    .empty-container {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 18px;
+    }
+
+    .empty-badge {
+      font-size: 54px;
+      animation: bounce 1s infinite alternate var(--spring);
+    }
+
+    @keyframes bounce {
+      from { transform: translateY(0); }
+      to { transform: translateY(-8px); }
+    }
+
+    .empty-title {
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .empty-text {
+      font-size: 13.5px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .btn-back {
+      padding: 14px 28px;
+      background: linear-gradient(135deg, #8DA9C4, #5b8db8);
+      border: none;
+      border-radius: 12px;
+      color: #0b1526;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 10px;
+      transition: transform 0.15s var(--spring);
+    }
+
+    .btn-back:hover {
+      transform: scale(1.02);
+    }
+
+    /* Loading overlay */
+    .loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(20, 26, 31, 0.95);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 24px;
+      z-index: 10;
+      display: none;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="card-header">
+      <h1 id="title-main">Active Recall Reviews</h1>
+      <div class="progress-text" id="progress-indicator">Card 0 of 0</div>
+    </div>
+
+    <div style="position: relative; flex: 1;">
+      <!-- Loading overlay -->
+      <div class="loading-overlay" id="loading-overlay">
+        <div class="spinner"></div>
+      </div>
+
+      <div class="card-body">
+        <!-- Quiz State -->
+        <div class="quiz-container" id="quiz-container">
+          <div class="topic-badge" id="card-topic">GENERAL</div>
+          <div class="question-box" id="card-question">What is the capital of France?</div>
+          
+          <div class="divider" id="card-divider"></div>
+          <div class="solution-box" id="card-solution">Paris is the capital and most populous city of France.</div>
+          
+          <button class="btn-show" id="btn-show-solution">Show Answer</button>
+
+          <!-- Rate rating selection -->
+          <div class="rating-container" id="rating-container">
+            <div class="rating-label">Rate your recall quality:</div>
+            <div class="rating-grid">
+              <button class="btn-rate" data-score="0">0<span>Blackout</span></button>
+              <button class="btn-rate" data-score="1">1<span>Wrong</span></button>
+              <button class="btn-rate" data-score="2">2<span>Barely</span></button>
+              <button class="btn-rate" data-score="3">3<span>Difficult</span></button>
+              <button class="btn-rate" data-score="4">4<span>Good</span></button>
+              <button class="btn-rate" data-score="5">5<span>Perfect</span></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-container" id="empty-container">
+          <div class="empty-badge">🎉</div>
+          <div class="empty-title">All caught up!</div>
+          <div class="empty-text">No reviews are due right now. Awesome job staying on top of your learning intervals!</div>
+          <a href="dashboard.html" class="btn-back">Go to Dashboard</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="reviews.js"></script>
+</body>
+</html>

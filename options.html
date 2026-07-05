@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>YouTube Copilot Pro 3.0 Dashboard Setup</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0f0f0f; color: #f1f1f1; padding: 40px; margin: 0; }
+        .card { background: #1f1f1f; border: 1px solid #333; border-radius: 12px; padding: 24px; max-width: 500px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h1 { font-size: 20px; margin-top: 0; color: #fff; }
+        p { font-size: 14px; color: #aaa; line-height: 1.5; }
+        button { background: #4f46e5; border: none; padding: 10px 20px; font-weight: 600; font-size: 14px; color: #fff; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
+        button:hover { background: #4338ca; }
+        .success-banner { display: none; background: #065f46; border: 1px solid #047857; color: #34d399; padding: 10px; border-radius: 6px; margin-top: 15px; font-size: 13px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🎙️ Hardware Microphone Provisioning</h1>
+        <p>Before launching voice notes inside the active YouTube video canvas player tracking loop, click below to authorize Chrome hardware line permissions for this extension environment block.</p>
+        <button id="activate-mic">Test & Authorize Hardware Microphone Access</button>
+        <div id="status" class="success-banner">✅ Authorization Verified! You can now use the mic directly inside the YouTube player deck.</div>
+    </div>
+    <script>
+        document.getElementById('activate-mic').addEventListener('click', async () => {
+            try {
+                const verifiedHardwareStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                verifiedHardwareStream.getTracks().forEach((lineTrack) => lineTrack.stop());
+                document.getElementById('status').style.display = 'block';
+            } catch (err) {
+                alert(`Hardware access rejection warning: ${err.name} — ${err.message}`);
+            }
+        });
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Learning Analytics Dashboard — Universal AI Copilot</title>
+  
+  <!-- Font Imports -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" />
+  
+  <!-- Content Security Policy Compliant local Chart.js -->
+  <script src="chart.min.js"></script>
+  
+  <!-- Global Stylesheet -->
+  <link rel="stylesheet" href="../styles.css" />
+</head>
+<body>
+  
+  <div class="dashboard-grid-container">
+    
+    <!-- LEFT SIDEBAR NAVIGATION -->
+    <aside class="sidebar-navigation">
+      <div class="nav-brand-logo">🌊</div>
+      <nav class="nav-menu-wrapper">
+        <button class="nav-link active" data-target="analytics" title="Analytics Dashboard">📊</button>
+        <button class="nav-link" data-target="workspaces" title="Integration Settings">⚙️</button>
+      </nav>
+    </aside>
+
+    <!-- CENTER MAIN STREAM CONTENT -->
+    <main class="main-content-stream">
+      <header class="dashboard-user-header">
+        <h1 id="dynamic-user-greeting">Hallo Learner!! <span>👋</span></h1>
+        <p class="subtitle-text">Let's learn something new today!</p>
+      </header>
+
+      <!-- PREMIUM GLASS HERO BANNER -->
+      <section class="premium-hero-banner">
+        <div class="hero-text-content">
+          <h2>The right choice for your learning path.</h2>
+          <p>Optimize retention and review concepts with SuperMemo-2 mathematical spacing.</p>
+        </div>
+        <button class="banner-action-btn">Launch Deep Work Session</button>
+      </section>
+
+      <!-- ACTIVE COURSES GRID -->
+      <section class="learning-sources-section">
+        <h3>Your Active Learning Sources</h3>
+        <div id="live-sources-grid" class="cards-layout-grid">
+          <!-- Dynamically populated card items -->
+          <div class="loading-placeholder">Loading active sources...</div>
+        </div>
+      </section>
+    </main>
+
+    <!-- RIGHT METRICS SUMMARY BAR -->
+    <aside class="right-metrics-panel">
+      
+      <!-- USER AVATAR FRAME CARD -->
+      <div class="user-profile-summary-card">
+        <div class="avatar-frame">👦</div>
+        <h3 id="profile-display-name">...</h3>
+        <p id="profile-display-handle">@learner</p>
+        
+        <!-- Stats Index Grid Row -->
+        <div class="profile-stats-row">
+          <div class="profile-stat-col">
+            <div class="stat-num" id="stat-count-clips">0</div>
+            <div class="stat-label">Clips</div>
+          </div>
+          <div class="profile-stat-col">
+            <div class="stat-num" id="stat-current-streak">0</div>
+            <div class="stat-label">Streak</div>
+          </div>
+          <div class="profile-stat-col">
+            <div class="stat-num" id="stat-max-streak">0</div>
+            <div class="stat-label">Max</div>
+          </div>
+          <div class="profile-stat-col">
+            <div class="stat-num" id="stat-focus-hours">0h</div>
+            <div class="stat-label">Time</div>
+          </div>
+          <div class="profile-stat-col">
+            <div class="stat-num" id="stat-due-cards">0</div>
+            <div class="stat-label">Cards</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 7-DAY LINE TIMELINE -->
+      <div class="chart-glass-container">
+        <h3>Your Activity (Past 7 Days)</h3>
+        <div class="trends-canvas-wrapper">
+          <canvas id="live-focus-trends-chart"></canvas>
+        </div>
+      </div>
+
+      <!-- SPACED REPETITION CARD STACK -->
+      <div class="queue-glass-container">
+        <h3>Spaced Repetition Queue (SM-2)</h3>
+        <div id="live-sm2-queue-stack">
+          <!-- Dynamically populated recall stack elements -->
+          <div class="loading-placeholder">Loading recall queue...</div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Execution Script -->
+  <script src="dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome to YouTube Copilot v4.0.0</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --surface:      rgba(35, 44, 51, 0.96);
+      --well:         rgba(11, 37, 69, 0.50);
+      --accent:       #8DA9C4;
+      --accent-dim:   rgba(141, 169, 196, 0.18);
+      --text:         #DAEDF7;
+      --muted:        rgba(141, 169, 196, 0.60);
+      --success:      #34A853;
+      --amber:        #FFAA00;
+      --danger:       #AD343E;
+      --border:       rgba(141, 169, 196, 0.18);
+      --border-glow:  rgba(141, 169, 196, 0.50);
+      --spring:       cubic-bezier(0.34, 1.56, 0.64, 1);
+      --ease:         cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    html, body {
+      min-height: 100vh;
+      font-family: 'Inter', system-ui, sans-serif;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(141,169,196,0.12) 0%, transparent 70%),
+                  linear-gradient(160deg, #0b1526 0%, #131f33 50%, #0d1a2e 100%);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 16px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 520px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.6), 0 0 0 1px rgba(141,169,196,0.07);
+      animation: slide-up 0.5s var(--spring) both;
+    }
+
+    @keyframes slide-up {
+      from { transform: translateY(32px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+
+    /* Header */
+    .card-header {
+      background: linear-gradient(135deg, rgba(141,169,196,0.1), rgba(141,169,196,0.04));
+      border-bottom: 1px solid var(--border);
+      padding: 36px 36px 28px;
+      text-align: center;
+    }
+
+    .logo-emblem {
+      width: 64px; height: 64px;
+      border-radius: 18px;
+      background: var(--well);
+      border: 1px solid var(--border-glow);
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 30px;
+      margin-bottom: 16px;
+      box-shadow: 0 0 30px rgba(141,169,196,0.15);
+    }
+
+    h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+    h1 span { color: var(--accent); }
+    .subtitle { font-size: 13.5px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+
+    /* Steps */
+    .card-body { padding: 28px 36px 32px; }
+
+    .step { display: none; flex-direction: column; gap: 18px; }
+    .step.active { display: flex; animation: fade-in 0.3s var(--ease) both; }
+
+    @keyframes fade-in { from { opacity:0; transform:translateX(10px); } to { opacity:1; transform:none; } }
+
+    .step-label {
+      font-size: 11px; font-weight: 700; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.8px;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .step-num {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--accent-dim); border: 1px solid var(--border-glow);
+      color: var(--accent); font-size: 10px; font-weight: 700;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+
+    /* Google sign-in button */
+    #google-sign-in-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 14px 20px;
+      background: var(--well); border: 1px solid var(--border-glow);
+      border-radius: 12px; color: var(--text); font-size: 14px; font-weight: 600;
+      font-family: inherit; cursor: pointer;
+      transition: background 0.2s, transform 0.15s var(--spring), box-shadow 0.2s;
+    }
+    #google-sign-in-btn:hover {
+      background: rgba(141,169,196,0.1); transform: scale(1.02);
+      box-shadow: 0 0 0 2px var(--border-glow);
+    }
+    #google-sign-in-btn svg { flex-shrink: 0; }
+
+    /* User info */
+    #user-info-box {
+      display: none; align-items: center; gap: 12px;
+      background: var(--well); border: 1px solid var(--border);
+      border-radius: 12px; padding: 12px 14px;
+    }
+    #user-avatar { width: 36px; height: 36px; border-radius: 50%; }
+    #user-name { font-size: 13px; font-weight: 600; }
+    #user-email { font-size: 11px; color: var(--muted); }
+
+    /* Platform grid */
+    .platform-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .platform-card {
+      border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px;
+      cursor: pointer; background: var(--well);
+      transition: border-color 0.2s, background 0.2s;
+      user-select: none;
+    }
+
+    .platform-card.selected {
+      border-color: var(--accent);
+      background: rgba(141,169,196,0.1);
+    }
+
+    .platform-card .platform-icon { font-size: 22px; margin-bottom: 6px; }
+    .platform-card .platform-name { font-size: 12px; font-weight: 600; }
+    .platform-card .platform-desc { font-size: 10.5px; color: var(--muted); margin-top: 2px; }
+
+    /* Key fields */
+    .key-field { display: none; flex-direction: column; gap: 6px; }
+    .key-field.visible { display: flex; }
+    .key-field label { font-size: 11.5px; font-weight: 600; color: var(--muted); }
+    .key-field input {
+      background: var(--well); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 14px; color: var(--text);
+      font-family: inherit; font-size: 12.5px; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .key-field input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(141,169,196,0.12);
+    }
+    .key-field input::placeholder { color: var(--muted); }
+
+    /* Primary Button */
+    .btn-primary {
+      width: 100%; padding: 14px;
+      background: linear-gradient(135deg, #8DA9C4, #5b8db8);
+      border: none; border-radius: 12px;
+      color: #0b1526; font-size: 14px; font-weight: 700;
+      font-family: inherit; cursor: pointer;
+      transition: transform 0.15s var(--spring), opacity 0.15s;
+    }
+    .btn-primary:hover { transform: scale(1.02); opacity: 0.92; }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    /* Success step */
+    .success-badge {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: rgba(52, 168, 83, 0.1); border: 2px solid var(--success);
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 30px; margin: 0 auto;
+      animation: pop 0.4s var(--spring) both;
+    }
+    @keyframes pop { from { transform: scale(0.5); opacity:0; } to { transform: scale(1); opacity:1; } }
+
+    .success-title { font-size: 20px; font-weight: 800; text-align: center; }
+    .success-sub   { font-size: 13px; color: var(--muted); text-align: center; line-height: 1.6; }
+
+    .trial-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(141,169,196,0.12); border: 1px solid var(--border-glow);
+      border-radius: 20px; padding: 6px 14px;
+      font-size: 12px; font-weight: 600; color: var(--accent);
+      margin: 0 auto;
+    }
+
+    /* Status message */
+    #step-status {
+      font-size: 11.5px; text-align: center; min-height: 18px;
+      transition: color 0.2s;
+    }
+
+    /* Progress dots */
+    .progress-dots {
+      display: flex; justify-content: center; gap: 6px;
+      padding: 0 36px 20px;
+    }
+    .dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--border); transition: background 0.3s, transform 0.3s;
+    }
+    .dot.active { background: var(--accent); transform: scale(1.3); }
+
+    .btn-oauth-connect {
+      background: var(--well);
+      border: 1px solid var(--border-glow);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 8px 14px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .btn-oauth-connect:hover {
+      background: rgba(141, 169, 196, 0.15);
+      border-color: var(--accent);
+    }
+    .btn-oauth-connect.connected {
+      background: rgba(52, 168, 83, 0.1);
+      border-color: var(--success);
+      color: var(--success);
+      cursor: default;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="card-header">
+      <div class="logo-emblem">🎬</div>
+      <h1>YouTube <span>Copilot</span></h1>
+      <p class="subtitle">Your AI-powered learning workspace — directly inside YouTube.</p>
+    </div>
+
+    <div class="progress-dots" id="progress-dots">
+      <div class="dot active" data-step="0"></div>
+      <div class="dot" data-step="1"></div>
+      <div class="dot" data-step="2"></div>
+      <div class="dot" data-step="3"></div>
+    </div>
+
+    <div class="card-body">
+
+      <!-- Step 0: Sign in -->
+      <div class="step active" id="step-0">
+        <div class="step-label"><span class="step-num">1</span> Secure Identity</div>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6;">Sign in with Google to activate your 7-day all-access trial. No credit card required.</p>
+        <button id="google-sign-in-btn">
+          <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+          Sign in with Google
+        </button>
+
+        <div style="display:flex;align-items:center;gap:10px;margin:4px 0;">
+          <div style="flex:1;height:1px;background:var(--border);"></div>
+          <span style="font-size:10px;color:var(--muted);white-space:nowrap;">or</span>
+          <div style="flex:1;height:1px;background:var(--border);"></div>
+        </div>
+
+        <button id="dev-skip-btn" style="
+          display:flex;align-items:center;justify-content:center;gap:8px;
+          width:100%;padding:12px 20px;
+          background:transparent;border:1px dashed var(--border);
+          border-radius:12px;color:var(--muted);font-size:13px;font-weight:500;
+          font-family:inherit;cursor:pointer;
+          transition:border-color 0.2s,color 0.2s;
+        ">🛠️ Continue without sign-in (Dev / Test Mode)</button>
+
+        <div id="user-info-box">
+          <img id="user-avatar" src="" alt="avatar" />
+          <div>
+            <div id="user-name"></div>
+            <div id="user-email"></div>
+          </div>
+        </div>
+
+        <div id="step-status" style="color:var(--muted);"></div>
+        <button class="btn-primary" id="step-0-next" disabled>Continue →</button>
+      </div>
+
+      <!-- Step 1: Select platforms -->
+      <div class="step" id="step-1">
+        <div class="step-label"><span class="step-num">2</span> Choose Your Workspaces</div>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6;">Select all platforms you want to sync your notes to:</p>
+
+        <div class="platform-grid">
+          <div class="platform-card" data-platform="notion">
+            <div class="platform-icon">📝</div>
+            <div class="platform-name">Notion</div>
+            <div class="platform-desc">Pages & Databases</div>
+          </div>
+          <div class="platform-card" data-platform="googledocs">
+            <div class="platform-icon">📄</div>
+            <div class="platform-name">Google Docs</div>
+            <div class="platform-desc">Append Documents</div>
+          </div>
+
+          <div class="platform-card" data-platform="coda">
+            <div class="platform-icon">🥥</div>
+            <div class="platform-name">Coda</div>
+            <div class="platform-desc">Workspace Docs</div>
+          </div>
+
+        </div>
+
+        <div style="display:flex; gap:12px; margin-top: 10px;">
+          <button class="btn-oauth-connect" id="step-1-back" type="button" style="flex:1; padding:14px; font-size:13px; font-weight:600;">← Back</button>
+          <button class="btn-primary" id="step-1-next" style="flex:2;">Configure API Keys →</button>
+        </div>
+      </div>
+
+      <!-- Step 2: Enter API keys -->
+      <div class="step" id="step-2">
+        <div class="step-label"><span class="step-num">3</span> API Keys</div>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6;">Keys are stored <strong style="color:var(--text);">only in your local browser</strong> — never sent to any server except the platform's own API.</p>
+
+        <div class="key-field" id="key-notion" data-platform="notion" style="flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; background: rgba(141,169,196,0.05); padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border);">
+          <div>
+            <div style="font-size: 13px; font-weight: 600;">Notion Connection</div>
+            <div id="status-connect-notion" style="font-size: 11px; color: var(--muted); margin-top: 2px;">Not Connected</div>
+          </div>
+          <button class="btn-oauth-connect" id="btn-connect-notion" type="button">Connect Notion</button>
+        </div>
+
+        <div class="key-field" id="key-googledocs" data-platform="googledocs" style="flex-direction: column; gap: 12px; background: rgba(141,169,196,0.05); padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border);">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%;">
+            <div>
+              <div style="font-size: 13px; font-weight: 600;">Google Docs Connection</div>
+              <div id="status-connect-googledocs" style="font-size: 11px; color: var(--muted); margin-top: 2px;">Not Connected</div>
+            </div>
+            <button class="btn-oauth-connect" id="btn-connect-googledocs" type="button">Connect Google Docs</button>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px; width: 100%;">
+            <label style="font-size: 11px; font-weight: 600; color: var(--muted);">Destination Document ID</label>
+            <input type="text" id="input-gdocs-id" placeholder="1aBcDdEeFf..." autocomplete="off" style="background: var(--well); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; color: var(--text); font-size: 12px; outline: none;" />
+          </div>
+        </div>
+
+
+
+        <div class="key-field" id="key-coda" data-platform="coda" style="flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; background: rgba(141,169,196,0.05); padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border);">
+          <div>
+            <div style="font-size: 13px; font-weight: 600;">Coda Connection</div>
+            <div id="status-connect-coda" style="font-size: 11px; color: var(--muted); margin-top: 2px;">Not Connected</div>
+          </div>
+          <button class="btn-oauth-connect" id="btn-connect-coda" type="button">Connect Coda</button>
+        </div>
+
+
+
+        <div id="step-status-2" style="font-size:11.5px;text-align:center;color:var(--muted);min-height:18px;"></div>
+        <div style="display:flex; gap:12px; margin-top: 10px;">
+          <button class="btn-oauth-connect" id="step-2-back" type="button" style="flex:1; padding:14px; font-size:13px; font-weight:600;">← Back</button>
+          <button class="btn-primary" id="step-2-save" style="flex:2;">Save & Complete Setup ✓</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Success -->
+      <div class="step" id="step-3">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+          <div class="success-badge">✅</div>
+          <div class="success-title">You're all set!</div>
+          <div class="trial-chip">⚡ 7-Day All-Access Trial Active</div>
+          <div class="success-sub">Head over to any YouTube video and click the floating badge in the bottom-right corner to start capturing notes.</div>
+          <button class="btn-primary" id="goto-youtube-btn" style="max-width:280px;">
+            🎬 Go to YouTube
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <script src="welcome.js"></script>
+</body>
+</html>

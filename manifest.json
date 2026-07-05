@@ -1,0 +1,79 @@
+{
+  "manifest_version": 3,
+  "name": "Universal AI Learning Copilot",
+  "version": "5.0.0",
+  "description": "Transform YouTube into your personal knowledge workspace. Capture frames, dictate notes, and sync to Notion, Google Docs & Coda.",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "identity",
+    "alarms",
+    "clipboardWrite",
+    "tabs"
+  ],
+  "host_permissions": [
+    "*://*.youtube.com/*",
+    "*://*.udemy.com/*",
+    "*://*.coursera.org/*",
+    "*://*.edx.org/*",
+    "*://*.linkedin.com/*",
+    "*://*.unacademy.com/*",
+    "*://*.uacdn.net/*",
+    "*://*.scaler.com/*",
+    "*://*.pluralsight.com/*",
+    "*://*.frontendmasters.com/*",
+    "*://*.udacity.com/*",
+    "*://*.khanacademy.org/*",
+    "http://localhost:3000/*",
+    "https://*.supabase.co/*",
+    "*://*.chromiumapp.org/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "YouTube Copilot v4.0.0",
+    "default_icon": {
+      "16": "assets/logo-icon.png",
+      "48": "assets/logo-icon.png",
+      "128": "assets/logo-icon.png"
+    }
+  },
+  "options_ui": {
+    "page": "pages/options.html",
+    "open_in_tab": true
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.youtube.com/*",
+        "*://*.udemy.com/*",
+        "*://*.coursera.org/*",
+        "*://*.edx.org/*",
+        "*://*.linkedin.com/*",
+        "*://*.unacademy.com/*",
+        "*://*.uacdn.net/*",
+        "*://*.scaler.com/*",
+        "*://*.pluralsight.com/*",
+        "*://*.frontendmasters.com/*",
+        "*://*.udacity.com/*",
+        "*://*.khanacademy.org/*"
+      ],
+      "js": ["content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["pages/welcome.html", "assets/*", "inject.js"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "oauth2": {
+    "client_id": "376117350284-kr3lts2kh1fhk81864ncc14dchj7hv47.apps.googleusercontent.com",
+    "scopes": ["openid", "email", "profile"]
+  }
+}
