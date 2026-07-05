@@ -8,38 +8,6 @@ let currentStep = 0;
 let selectedPlatforms = [];
 let userJWT = null;
 
-// ─── Dev Skip Bypass ──────────────────────────────────────────────────────────
-document.getElementById('dev-skip-btn')?.addEventListener('click', () => {
-  const mockPayload = btoa(JSON.stringify({ 
-    sub: '23331303-1918-41b3-9db4-482668fc695d',
-    email: 'prisingh751@gmail.com'
-  })).replace(/=/g, '');
-  const mockJWT = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${mockPayload}.mocksignature`;
-
-  chrome.storage.local.set({
-    copilot_dev_mode: true,
-    copilot_tier: 'TRIAL',
-    copilot_user_name: 'Prins Singh',
-    copilot_user_email: 'prisingh751@gmail.com',
-    copilot_jwt: mockJWT,
-  }, () => {
-    goToStep(3); // Jump straight to success screen
-  });
-});
-
-// Hover effect for dashed button
-const skipBtn = document.getElementById('dev-skip-btn');
-if (skipBtn) {
-  skipBtn.addEventListener('mouseenter', () => {
-    skipBtn.style.borderColor = 'var(--accent)';
-    skipBtn.style.color = 'var(--text)';
-  });
-  skipBtn.addEventListener('mouseleave', () => {
-    skipBtn.style.borderColor = 'var(--border)';
-    skipBtn.style.color = 'var(--muted)';
-  });
-}
-
 
 // ─── Step Navigation ──────────────────────────────────────────────────────────
 function goToStep(index) {

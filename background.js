@@ -212,23 +212,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 
-  // PIPELINE: Open Full-Screen Dashboard Tab (single-instance)
-  if (message.action === 'OPEN_DASHBOARD') {
-    const dashboardUrl = chrome.runtime.getURL('pages/dashboard.html');
-    chrome.tabs.query({ url: dashboardUrl }, (existingTabs) => {
-      if (existingTabs && existingTabs.length > 0) {
-        chrome.tabs.update(existingTabs[0].id, { active: true }, () => {
-          chrome.windows.update(existingTabs[0].windowId, { focused: true });
-          sendResponse({ success: true, reused: true });
-        });
-      } else {
-        chrome.tabs.create({ url: dashboardUrl }, (tab) => {
-          sendResponse({ success: true, reused: false, tabId: tab.id });
-        });
-      }
-    });
-    return true;
-  }
+
 
   // PIPELINE: Capture visible tab
   if (message.action === 'CAPTURE_VISIBLE_TAB') {

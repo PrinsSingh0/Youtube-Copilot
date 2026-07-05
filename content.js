@@ -486,20 +486,12 @@ function isPlatformLocked(platform) {
 }
 
 async function refreshTierStatus() {
-  // Check dev mode first
-  chrome.storage.local.get(['copilot_dev_mode', 'copilot_tier'], (data) => {
-    if (data.copilot_dev_mode) {
-      currentTier = data.copilot_tier || 'TRIAL';
-      return;
-    }
-    // Real auth path
-    const jwt = getStoredJWT();
-    if (!jwt) return;
-    chrome.runtime.sendMessage({ action: 'CHECK_TIER', jwt }, (data) => {
-      if (data?.tier) currentTier = data.tier;
-      if (data?.isPaywallDay) injectPaywallOverlay();
-      else applyTierConstraintsToUI();
-    });
+  const jwt = getStoredJWT();
+  if (!jwt) return;
+  chrome.runtime.sendMessage({ action: 'CHECK_TIER', jwt }, (data) => {
+    if (data?.tier) currentTier = data.tier;
+    if (data?.isPaywallDay) injectPaywallOverlay();
+    else applyTierConstraintsToUI();
   });
 }
 
@@ -830,16 +822,7 @@ function injectCopilotUI() {
       </select>
       <button id="copilot-new-file-btn" title="Create New Standalone Page">➕</button>
 
-      <!-- Dashboard pill button -->
-      <button id="copilot-dashboard-btn" title="Open Learning Dashboard" aria-label="Open Dashboard">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="13" height="13">
-          <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="#8DA9C4" stroke-width="1.6"/>
-          <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="#8DA9C4" stroke-width="1.6"/>
-          <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="#8DA9C4" stroke-width="1.6"/>
-          <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="#8DA9C4" stroke-width="1.6"/>
-        </svg>
-        <span>Dashboard</span>
-      </button>
+
 
       <button id="copilot-logo-trigger" title="Open Copilot">
         <div id="copilot-draft-dot"></div>
@@ -1010,15 +993,13 @@ function showAuthTooltip(anchor, data) {
       </div>
     </div>
     <div style="border-top:1px solid rgba(141,169,196,0.14);padding:8px 14px 10px;display:flex;flex-direction:column;gap:6px;">
-      <button id="cpa-dashboard" style="background:rgba(141,169,196,0.12);border:1px solid rgba(141,169,196,0.25);border-radius:8px;color:#8DA9C4;font-size:11px;padding:7px 10px;cursor:pointer;font-family:inherit;font-weight:500;text-align:left;">📊 Open Dashboard</button>
       <button id="cpa-signout" style="background:rgba(173,52,62,0.12);border:1px solid rgba(173,52,62,0.3);border-radius:8px;color:#AD343E;font-size:11px;padding:7px 10px;cursor:pointer;font-family:inherit;font-weight:500;text-align:left;">🚪 Sign Out</button>
     </div>`;
   const rect = anchor.getBoundingClientRect();
   tip.style.cssText = `position:fixed;bottom:${window.innerHeight-rect.top+8}px;right:${window.innerWidth-rect.right}px;width:210px;background:rgba(24,34,48,0.97);border:1px solid rgba(141,169,196,0.22);border-radius:14px;box-shadow:0 16px 48px rgba(0,0,0,0.65);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);z-index:2147483647;font-family:'Inter',system-ui,sans-serif;animation:copilot-slide-down 0.2s cubic-bezier(0.34,1.56,0.64,1) both;pointer-events:auto;`;
   document.getElementById('yt-copilot-root').appendChild(tip);
-  tip.querySelector('#cpa-dashboard')?.addEventListener('click', () => { tip.remove(); chrome.runtime.sendMessage({action:'OPEN_DASHBOARD'}); });
   tip.querySelector('#cpa-signout')?.addEventListener('click', () => {
-    chrome.storage.local.remove(['copilot_jwt','copilot_user_name','copilot_user_email','copilot_avatar_url','copilot_tier','copilot_dev_mode'], () => { tip.remove(); refreshAuthAvatar(); });
+    chrome.storage.local.remove(['copilot_jwt','copilot_user_name','copilot_user_email','copilot_avatar_url','copilot_tier'], () => { tip.remove(); refreshAuthAvatar(); });
   });
   const outside = (e) => { if (!tip.contains(e.target) && e.target!==anchor) { tip.remove(); document.removeEventListener('click',outside,true); } };
   setTimeout(() => document.addEventListener('click',outside,true), 100);
@@ -1037,7 +1018,6 @@ function wireUI() {
   const draftsBtn = document.getElementById('copilot-draft-dot');
   const tray = document.getElementById('copilot-drafts-tray');
   const indivToggle = document.getElementById('copilot-individual-page-toggle');
-  const dashboardBtn = document.getElementById('copilot-dashboard-btn');
   const authAvatarBtn = document.getElementById('copilot-auth-avatar');
 
   // Avatar init
@@ -1052,12 +1032,7 @@ function wireUI() {
       else chrome.runtime.sendMessage({action:'OPEN_WELCOME_PAGE'});
     });
   });
-  // Dashboard btn
-  dashboardBtn?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    dashboardBtn.style.opacity = '0.55';
-    chrome.runtime.sendMessage({action:'OPEN_DASHBOARD'}, () => { dashboardBtn.style.opacity = ''; });
-  });
+
 
   let panelOpen = false;
 
